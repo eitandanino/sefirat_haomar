@@ -1,8 +1,11 @@
-from datetime import datetime
+import os
 import requests
 from pyluach import dates
-import os
+from datetime import datetime
 
+
+apiToken = os.environ["API_TOKEN"]
+apiURL = f'https://api.telegram.org/bot{apiToken}/sendMessage'
 
 CURRENT_DAY = dates.HebrewDate.today().day
 CURRENT_MONTH = dates.HebrewDate.today().month
@@ -87,20 +90,34 @@ if (CURRENT_MONTH == 1 and CURRENT_DAY >= 14 or
             else:
                 return f"היום {sefira_day} יום לעומר שהם {weeks} שבועות ו" \
                        f" {sefira_day % 7} ימים"
+        
+             
+    def get_user_chat_ids():
+        try:
+            response = requests.get(f"https://api.telegram.org/bot{apiToken}/getUpdates")
+            data = response.json()
+            users_chat_ids = set()
+            for result in data["result"]:
+                if "message" in result:
+                    chat_id = result["message"]["chat"]["id"]
+                    users_chat_ids.add(chat_id)
+            return list(users_chat_ids)
+        except Exception as ee:
+            print(f"Error getting user chat IDs: {ee}")
+            return []
 
-
+        
+    user_chat_ids = get_user_chat_ids()
     all_sentence_english = get_english_sentence(sefira_day, weeks)
     all_sentence_hebrew = get_hebrew_sentence(sefira_day, weeks)
 
-    apiToken = os.environ["API_TOKEN"]
-    chatID = os.environ["CHAT_ID"]
-    apiURL = f'https://api.telegram.org/bot{apiToken}/sendMessage'
 
     #     print(get_english_sentence(sefira_day, weeks))
     #     print(get_hebrew_sentence(sefira_day, weeks))
-    try:
-        response = requests.post(apiURL, json={'chat_id': chatID,
-                                               'text': f'{all_sentence_hebrew} \n {all_sentence_english}'})
-    except Exception as e:
-        print(e)
+    for user_chat_id in user_chat_ids:
+        try:
+            response = requests.post(apiURL, json={'chat_id': user_chat_id,
+                                                   'text': f'{all_sentence_hebrew} \n {all_sentence_english}'})
+        except Exception as e:
+            print(e)
 
