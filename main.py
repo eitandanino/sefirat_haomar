@@ -194,7 +194,7 @@ if (CURRENT_MONTH == 1 and CURRENT_DAY >= 14 or
     # Calculate the sefirat haomer day and the number of weeks
     start_date = datetime(year, month, day)  # or the first night of Passover
     days = (now - start_date).days
-    sefira_day = days
+    sefira_day = days + 1
     weeks = sefira_day // 7
 
     # Add new ids to the db
