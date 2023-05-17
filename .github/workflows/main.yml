@@ -1,8 +1,8 @@
-name: Send Telegram message
+name: Send Telegram and Whatsapp messages
 
 on:
   schedule:
-    - cron: '0 17 * * *'
+    - cron: '35 17 * * *'
   workflow_dispatch:
 
 jobs:
@@ -24,5 +24,8 @@ jobs:
           CHAT_ID: ${{ secrets.CHAT_ID }}
           USER_NAME: ${{ secrets.USER_NAME }}
           MONGO_DB_PASSWORD: ${{ secrets.MONGO_DB_PASSWORD }}
+          GID: ${{ secrets.GID }}
+          RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+          RAPID_API_KEY_2: ${{ secrets.RAPID_API_KEY_2 }}
         run: |
           python main.py
